@@ -36,16 +36,20 @@ class NewVisitorTest(unittest.TestCase):
 
         table = self.browser.find_element(By.ID, "id_list_table")
         rows = table.find_elements(By.TAG_NAME, "tr")
-        self.assertTrue(
-            any(row.text == "1. Buy a nintendo switch" for row in rows),
-            "New to-do item did not appear in the table",
-            )
+        self.assertIn("1. Buy a nintendo switch", [row.text for row in rows])
 
         #There is still a text box inviting him to add another item.
         #He enters "Buy some of the pokemon games"
-        self.fail("Finish the test!")
+        inputbox = self.browser.find_element(By.ID, "id_new_item")
+        inputbox.send_keys("Buy some of the pokemon games")
+        inputbox.send_keys(Keys.ENTER)
+        time.sleep(1)
 
         #The page updates again, and now shows both item on his list
+        table = self.browser.find_element(By.ID, "id_list_table")
+        rows = table.find_elements(By.TAG_NAME, "tr")
+        self.assertIn("1. Buy a nintendo switch", [row.text for row in rows],)
+        self.assertIn("2. Buy some of the pokemon games", [row.text for row in rows],)
 
         #Satisfied, he goes back to his work
 
