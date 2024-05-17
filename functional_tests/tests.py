@@ -4,6 +4,9 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.common.keys import Keys
 import time
 from django.test import LiveServerTestCase
+from selenium.common.exceptions import WebDriverException
+
+MAX_WAIT = 5
 
 class NewVisitorTest(LiveServerTestCase):
     def setUp(self):
@@ -12,10 +15,18 @@ class NewVisitorTest(LiveServerTestCase):
     def tearDown(self):
         self.browser.quit()
 
-    def check_for_row_in_list_table(self, row_text):
-        table = self.browser.find_element(By.ID, "id_list_table")
-        rows = table.find_elements(By.TAG_NAME, "tr")
-        self.assertIn(row_text, [row_text for row in rows])
+    def wait_for_row_in_list_table(self, row_text):
+        start_time = time.time()
+        while True:
+            try:
+                table = self.browser.find_element(By.ID, "id_list_table")
+                rows = table.find_elements(By.TAG_NAME, "tr")
+                self.assertIn(row_text, [row_text for row in rows])
+                return
+            except (AssertionError, WebDriverException):
+                if time.time() - start_time > MAX_WAIT:
+                    raise
+                time.sleep(0.5)
 
     def test_can_start_a_todo_list(self):
         #Kris has heard about a cool new online To-Do app
@@ -39,19 +50,17 @@ class NewVisitorTest(LiveServerTestCase):
         #When he hits enter, the page updates and now the page lists
         #"1. Buy a nintendo switch" as an item in a to-do list
         inputbox.send_keys(Keys.ENTER)
-        time.sleep(1)
-        self.check_for_row_in_list_table("1. Buy a nintendo switch")
+        self.wait_for_row_in_list_table("1. Buy a nintendo switch")
 
         #There is still a text box inviting him to add another item.
         #He enters "Buy some of the pokemon games"
         inputbox = self.browser.find_element(By.ID, "id_new_item")
         inputbox.send_keys("Buy some of the pokemon games")
         inputbox.send_keys(Keys.ENTER)
-        time.sleep(1)
 
         #The page updates again, and now shows both item on his list
-        self.check_for_row_in_list_table("1. Buy a nintendo switch")
-        self.check_for_row_in_list_table("2. Buy some of the pokemon games")
+        self.wait_for_row_in_list_table("1. Buy a nintendo switch")
+        self.wait_for_row_in_list_table("2. Buy some of the pokemon games")
 
         #Satisfied, he goes back to his work
 
