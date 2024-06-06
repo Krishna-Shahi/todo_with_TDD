@@ -17,3 +17,8 @@ class ItemForm(forms.models.ModelForm):
             ),
         }
         error_messages = {"text": {"required": EMPTY_ITEM_ERROR}}
+
+    # The .instance attribute on a form represents the database object that is being modified or created
+    def save(self, for_list):
+        self.instance.list = for_list
+        return super().save()
