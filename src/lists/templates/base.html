@@ -17,7 +17,11 @@
                 {% if user.email %}
                 <ul>
                     <span class="navbar-text">Logged in as {{ user.email }}</span>
-                    <a href="#TODO">Log out</a>
+                    <form id="logout-form" action="{% url 'logout' %}" method="post" style="display:none;">
+                        {% csrf_token %}
+                    </form>
+                    <a href="#" onclick="document.getElementById('logout-form').submit();">Log out</a>
+                    
                 </ul>
                 {% else %}
                 <form method="POST" action="{% url 'send-login-email' %}">
