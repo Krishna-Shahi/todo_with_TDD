@@ -10,7 +10,7 @@ SUBJECT = 'Your login link for Superlists'
 
 class LoginTest(FunctionalTest):
     def test_get_email_link_to_log_in(self):
-        # KRis goes to the awesome superlists site
+        # Kris goes to the awesome superlists site
         # and notices a "Log in" section in the navbar for the first time
         # It's telling him to enter his email address, so he does
         self.browser.get(self.live_server_url)
